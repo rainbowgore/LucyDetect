@@ -45,5 +45,5 @@ def save_data(data: dict):
 def get_data():
     if collection is None:
         return {"error": "No database connection"}
-    
+    streamlit run app.py
     return list(collection.find({}, {"_id": 0}).sort("timestamp", -1).limit(5))
