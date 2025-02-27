@@ -1,7 +1,7 @@
 import openai
 import os
 import requests
-import asyncio
+import streamlit as st
 from datetime import datetime
 from dotenv import load_dotenv
 from drift_monitor import save_response_to_faiss, get_most_similar_response, calculate_similarity
@@ -10,48 +10,58 @@ from drift_monitor import save_response_to_faiss, get_most_similar_response, cal
 load_dotenv()
 
 # ✅ Backend API URL (FastAPI on Render)
-API_URL = os.getenv("BACKEND_API_URL", "https://lucydetect.onrender.com")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+API_URL = os.getenv("API_URL")  # Set this in Streamlit Secrets
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Set this in Streamlit Secrets
 
 # ✅ Ensure API key is set
 if not OPENAI_API_KEY:
-    raise ValueError("❌ ERROR: No OpenAI API Key found. Set OPENAI_API_KEY in .env or Streamlit Secrets.")
+    st.error("❌ ERROR: No OpenAI API Key found. Set OPENAI_API_KEY in Streamlit Secrets.")
+    st.stop()
 
 openai.api_key = OPENAI_API_KEY
 
-async def get_llm_response(query):
-    """Fetch LLM response from OpenAI API (Async Safe)."""
-    loop = asyncio.get_event_loop()
-    response = await loop.run_in_executor(
-        None,
-        lambda: openai.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": query}],
-            temperature=0.7
-        )
+# ✅ Streamlit UI
+st.title("🔮 LLM Drift Analyzer")
+st.write("Compare AI responses over time to detect inconsistencies.")
+
+# ✅ User input
+query = st.text_input("Enter your prompt:")
+submit_button = st.button("Analyze Drift")
+
+# ✅ Function to get response from OpenAI
+def get_llm_response(query):
+    """Fetch LLM response from OpenAI API."""
+    response = openai.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": query}],
+        temperature=0.7
     )
     return response.choices[0].message.content
 
+# ✅ Function to analyze drift
 def analyze_drift(query):
-    """Runs drift analysis on an LLM response and logs results."""
+    """Runs drift analysis and logs results via the backend API."""
     timestamp = datetime.now().isoformat()
 
-    # ✅ Get new response
-    new_response = asyncio.run(get_llm_response(query))
-    print(f"New Response: {new_response}")
+    # ✅ Get new response from OpenAI
+    new_response = get_llm_response(query)
 
     # ✅ Compare with past responses
     save_response_to_faiss(new_response)
     past_response, similarity = get_most_similar_response(new_response)
 
-    drift_score = 1 - similarity
-    print(f"Similarity Score: {similarity:.2f}")
-    print(f"Drift Score: {drift_score:.2f}")
+    drift_score = 1 - similarity  # Higher = more drift
+
+    # ✅ Display drift scores
+    st.write("### ✅ Latest Response:")
+    st.write(new_response)
+    st.write(f"**📊 Similarity Score:** {similarity:.2f}")
+    st.write(f"**⚠️ Drift Score:** {drift_score:.2f}")
 
     if drift_score > 0.3:
-        print("🚨 ALERT: High LLM drift detected!")
+        st.warning("🚨 ALERT: High LLM drift detected!")
 
-    # ✅ Store response using API
+    # ✅ Store response via backend API
     payload = {
         "timestamp": timestamp,
         "query": query,
@@ -62,25 +72,28 @@ def analyze_drift(query):
     api_response = requests.post(f"{API_URL}/save", json=payload)
 
     if api_response.status_code == 200:
-        print("✅ Response saved successfully!")
+        st.success("✅ Response saved successfully!")
     else:
-        print(f"❌ Error saving response: {api_response.text}")
+        st.error(f"❌ Error saving response: {api_response.text}")
 
     return payload
 
+# ✅ Fetch recent responses
 def get_recent_responses():
     """Fetch recent responses from backend API."""
     response = requests.get(f"{API_URL}/recent")
     if response.status_code == 200:
         return response.json()
-    print(f"❌ Error retrieving responses: {response.text}")
+    st.error(f"❌ Error retrieving responses: {response.text}")
     return []
 
-if __name__ == "__main__":
-    # Example run
-    query = "Explain why LLMs experience model drift."
+# ✅ Main execution
+if submit_button and query:
     analyze_drift(query)
 
-    # Fetch & print recent responses
+    # ✅ Fetch & display recent responses
     recent_responses = get_recent_responses()
-    print("Recent Responses:", recent_responses)
+    if recent_responses:
+        st.write("### 🕒 Previous Responses:")
+        for res in recent_responses:
+            st.write(f"- **{res['timestamp']}**: {res['query']} → {res['response']}")
