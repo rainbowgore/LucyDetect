@@ -1,0 +1,29 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore Virtual Environment
+venv/
+env/
+*.venv
+
+# Ignore Environment Variables
+.env
+
+# Ignore Local Database (if using MongoDB)
+lucydetect.db
+
+# Ignore Logs & Temporary Files
+logs.json
+*.log
+*.DS_Store
+
+.env
+drift_monitor.cpython-310.pyc
+database.cpython-310.pyc
+config.cpython-310.pyc
+
+# Ignore database implementation
+database.py

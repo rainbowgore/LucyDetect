@@ -1,0 +1,8 @@
+echo "
+fastapi
+uvicorn
+openai
+pymongo
+python-dotenv
+requests
+" > requirements.txt
