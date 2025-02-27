@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 import os
+import uvicorn
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv

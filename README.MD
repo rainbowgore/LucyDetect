@@ -54,7 +54,7 @@ LucyDetect **quantifies response drift** by:
 
 ### 1️⃣ **Use the Public Web UI (No Installation Required)**
 _Anyone can use LucyDetect online without setup!_  
-🔗 **[LucyDetect Web UI](https://your-streamlit-app-link)**  
+🔗 **[LucyDetect Web UI](https://lucydetect.streamlit.app/) 
 
 ---
 
