@@ -1,8 +1,7 @@
-echo "
-fastapi
-uvicorn
+streamlit
 openai
 pymongo
 python-dotenv
+faiss-cpu
+sentence-transformers
 requests
-" > requirements.txt
