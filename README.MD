@@ -33,7 +33,7 @@ LucyDetect **quantifies response drift** by:
 
 ---
 
-## 🔹 **Use Cases**
+## **Use Cases**
 
 ### 👩‍💻 **For AI Developers**
 - **Monitor model consistency** across deployments.  
@@ -50,7 +50,7 @@ LucyDetect **quantifies response drift** by:
 
 ---
 
-## 🔹 **How to Use LucyDetect**
+##  **How to Use LucyDetect**
 
 ### 1️⃣ **Use the Public Web UI (No Installation Required)**
 _Anyone can use LucyDetect online without setup!_  

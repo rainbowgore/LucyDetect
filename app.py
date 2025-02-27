@@ -8,8 +8,8 @@ from drift_monitor import save_response_to_faiss, get_most_similar_response, cal
 # ✅ Load environment variables
 load_dotenv()
 
-# ✅ Backend API URL (FastAPI on Vercel)
-API_URL = os.getenv("BACKEND_API_URL")
+# ✅ Backend API URL (FastAPI)
+API_URL = "https://lucydetect.onrender.com"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # ✅ Ensure API key is set
